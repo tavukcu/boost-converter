@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>12V→48V Boost Converter - Halil Dinçer & Osman Aksoy</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        @page { size: A4; margin: 0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: #1a1a2e;
+            line-height: 1.65;
+            font-size: 10pt;
+            background: #fff;
+        }
+
+        /* ══════════════════════════════════════
+           TAKLİT ÖNLEME - WATERMARK & GÜVENLİK
+           ══════════════════════════════════════ */
+        .watermark {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.025;
+        }
+        .watermark-text {
+            position: absolute;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #000;
+            white-space: nowrap;
+            letter-spacing: 4px;
+            transform: rotate(-35deg);
+        }
+        /* Dağılmış watermark pozisyonları */
+        .wm1 { top: 8%; left: 5%; }
+        .wm2 { top: 25%; left: 35%; }
+        .wm3 { top: 42%; left: 10%; }
+        .wm4 { top: 58%; left: 45%; }
+        .wm5 { top: 75%; left: 15%; }
+        .wm6 { top: 90%; left: 40%; }
+
+        /* Sayfa watermark (her sayfada) */
+        .page-watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-40deg);
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: rgba(0,0,0,0.018);
+            white-space: nowrap;
+            letter-spacing: 8px;
+            z-index: 0;
+            pointer-events: none;
+            text-transform: uppercase;
+        }
+
+        /* Güvenlik mikro-metin şeridi */
+        .security-strip {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            overflow: hidden;
+            font-size: 2.5px;
+            line-height: 4px;
+            color: rgba(0,0,0,0.08);
+            letter-spacing: 0;
+            font-weight: 400;
+            white-space: nowrap;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ══════════════════════════════════════
+           KAPAK SAYFASI
+           ══════════════════════════════════════ */
+        .cover {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            text-align: center;
+            background: #050510;
+            color: #fff;
+            page-break-after: always;
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        /* Üst altın şerit */
+        .cover-gold-bar {
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #8B6914, #ffd700, #DAA520, #ffd700, #8B6914);
+        }
+        /* Üst bölüm - koyu */
+        .cover-top {
+            width: 100%;
+            padding: 1.8rem 2rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .cover-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem 1.5rem;
+            border: 1px solid rgba(0,180,255,0.25);
+            border-radius: 50px;
+            font-size: 0.6rem;
+            color: #00c8ff;
+            margin-bottom: 1.2rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            background: rgba(0,180,255,0.06);
+        }
+        .cover-badge .pulse {
+            width: 5px; height: 5px;
+            background: #00c8ff;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #00c8ff;
+        }
+        /* Voltaj dev yazı */
+        .cover-voltage {
+            font-size: 7rem;
+            font-weight: 900;
+            letter-spacing: -5px;
+            margin-bottom: 0;
+            line-height: 1;
+        }
+        .cover-voltage .v-in { color: #ffd700; }
+        .cover-voltage .v-arr {
+            font-size: 3.5rem;
+            color: rgba(255,255,255,0.15);
+            margin: 0 0.5rem;
+        }
+        .cover-voltage .v-out { color: #00c8ff; }
+        .cover-type {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 12px;
+            text-transform: uppercase;
+            margin-bottom: 1.2rem;
+        }
+
+        /* Orta - 3D görsel */
+        .cover-visual {
+            width: 100%;
+            padding: 0 3rem;
+            margin-bottom: 1.2rem;
+        }
+        .cover-img {
+            width: 100%;
+            max-width: 520px;
+            border-radius: 16px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.8), 0 0 50px rgba(0,180,255,0.08);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Alt altın şerit - üst */
+        .cover-gold-divider {
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #DAA520, #ffd700, #DAA520, transparent);
+        }
+
+        /* ★★★ İSİM BÖLÜMÜ ★★★ */
+        .cover-names-section {
+            width: 100%;
+            padding: 1.5rem 2rem;
+            background: linear-gradient(180deg, #0a0a18 0%, #0f0f25 100%);
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .cover-names-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: #DAA520;
+            margin-bottom: 0.8rem;
+        }
+        .cover-name-line {
+            font-size: 2.6rem;
+            font-weight: 900;
+            color: #ffd700;
+            letter-spacing: 3px;
+            text-shadow: 0 0 30px rgba(255,215,0,0.3);
+            line-height: 1.2;
+        }
+        .cover-name-amp {
+            font-size: 1.4rem;
+            font-weight: 300;
+            color: rgba(255,255,255,0.2);
+            margin: 0.3rem 0;
+            letter-spacing: 0;
+        }
+        .cover-desc {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.35);
+            max-width: 420px;
+            line-height: 1.7;
+            margin-top: 1rem;
+        }
+
+        /* Alt bilgi */
+        .cover-bottom-bar {
+            width: 100%;
+            padding: 0.6rem 2rem;
+            background: rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.55rem;
+            color: rgba(255,255,255,0.2);
+            border-top: 1px solid rgba(218,165,32,0.15);
+        }
+        .cover-serial {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.55rem;
+            color: rgba(255,255,255,0.15);
+            letter-spacing: 1px;
+        }
+        /* Alt altın şerit - alt */
+        .cover-gold-bar-bottom {
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #8B6914, #ffd700, #DAA520, #ffd700, #8B6914);
+        }
+
+        /* ══════════════════════════════════════
+           SAYFA HEADER
+           ══════════════════════════════════════ */
+        .page {
+            page-break-after: always;
+            padding: 0;
+            position: relative;
+            min-height: 100vh;
+        }
+        .page:last-child { page-break-after: avoid; }
+
+        .page-header {
+            background: linear-gradient(135deg, #080818, #101030);
+            color: #fff;
+            padding: 0.9rem 2.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(0,200,255,0.15);
+        }
+        .page-header .hdr-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .page-header .hdr-brand {
+            font-weight: 900;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+        .page-header .hdr-brand span { color: #00c8ff; }
+        .page-header .hdr-serial {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.55rem;
+            color: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+        }
+        .page-header .hdr-authors {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #ffd700;
+            letter-spacing: 0.5px;
+        }
+
+        .content {
+            max-width: 165mm;
+            margin: 0 auto;
+            padding: 1.2rem 0 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ══════════════════════════════════════
+           BAŞLIKLAR
+           ══════════════════════════════════════ */
+        .section-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, #00c8ff, #8c3cff);
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 900;
+            font-size: 1.2rem;
+            margin-right: 0.7rem;
+            box-shadow: 0 3px 12px rgba(0,180,255,0.25);
+            flex-shrink: 0;
+        }
+        h2 {
+            font-size: 1.45rem;
+            font-weight: 900;
+            color: #080818;
+            margin: 1.2rem 0 0.8rem;
+            display: flex;
+            align-items: center;
+        }
+        h3 {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #101030;
+            margin: 1rem 0 0.4rem;
+            padding-left: 0.7rem;
+            border-left: 3px solid #00c8ff;
+        }
+        p { margin-bottom: 0.6rem; }
+
+        /* ══════════════════════════════════════
+           HIGHLIGHT KUTULARI
+           ══════════════════════════════════════ */
+        .hl {
+            padding: 0.9rem 1.3rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border: 1px solid;
+            font-size: 0.9rem;
+        }
+        .hl-blue {
+            background: linear-gradient(135deg, #f0f7ff, #e6f2ff);
+            border-color: rgba(0,180,255,0.2);
+        }
+        .hl-blue strong { color: #006699; }
+        .hl-orange {
+            background: linear-gradient(135deg, #fffaf0, #fff3e0);
+            border-color: rgba(255,140,0,0.25);
+        }
+        .hl-orange strong { color: #cc6600; }
+        .hl-green {
+            background: linear-gradient(135deg, #f0fff4, #e6ffe6);
+            border-color: rgba(0,180,80,0.2);
+        }
+        .hl-green strong { color: #007a33; }
+        .hl-red {
+            background: linear-gradient(135deg, #fff5f5, #ffe6e6);
+            border-color: rgba(220,40,40,0.2);
+        }
+        .hl-red strong { color: #bb0000; }
+
+        /* ══════════════════════════════════════
+           TABLOLAR
+           ══════════════════════════════════════ */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 0.8rem 0 1rem;
+            font-size: 0.82rem;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+        }
+        th {
+            background: linear-gradient(135deg, #080818, #151535);
+            color: #fff;
+            padding: 0.6rem 0.9rem;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.75rem;
+            letter-spacing: 0.3px;
+        }
+        td {
+            padding: 0.45rem 0.9rem;
+            border-bottom: 1px solid #f0f0f5;
+        }
+        tr:nth-child(even) { background: #f8f9fc; }
+        tr:last-child td { border-bottom: none; }
+
+        /* ══════════════════════════════════════
+           FLOW DİYAGRAMI
+           ══════════════════════════════════════ */
+        .flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            margin: 1.2rem 0;
+        }
+        .flow-box {
+            background: linear-gradient(135deg, #080818, #1a2040);
+            color: #fff;
+            padding: 0.6rem 1.1rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-align: center;
+            min-width: 75px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+        }
+        .flow-box.main {
+            background: linear-gradient(135deg, #00c8ff, #8c3cff);
+            font-size: 0.9rem;
+            padding: 0.8rem 1.3rem;
+            box-shadow: 0 4px 18px rgba(0,180,255,0.35);
+        }
+        .flow-arrow {
+            font-size: 1.4rem;
+            color: #8c3cff;
+            font-weight: 900;
+        }
+
+        /* ══════════════════════════════════════
+           DİYAGRAM KUTULARI
+           ══════════════════════════════════════ */
+        .diagram {
+            background: #fafbfe;
+            border: 1px solid #e0e4f0;
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+        }
+        .diagram-title {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            color: #101030;
+            margin-bottom: 0.6rem;
+            font-size: 0.85rem;
+        }
+        .diagram pre {
+            font-size: 0.68rem;
+            line-height: 1.45;
+            display: inline-block;
+            text-align: left;
+            color: #333;
+        }
+
+        /* ══════════════════════════════════════
+           ADIM LİSTESİ
+           ══════════════════════════════════════ */
+        .step-list {
+            counter-reset: step;
+            list-style: none;
+            padding: 0;
+        }
+        .step-list li {
+            counter-increment: step;
+            padding: 0.6rem 0 0.6rem 3rem;
+            position: relative;
+            border-bottom: 1px solid #f0f0f5;
+            font-size: 0.9rem;
+        }
+        .step-list li:last-child { border-bottom: none; }
+        .step-list li::before {
+            content: counter(step);
+            position: absolute;
+            left: 0; top: 0.5rem;
+            width: 2rem; height: 2rem;
+            background: linear-gradient(135deg, #00c8ff, #8c3cff);
+            color: #fff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 8px rgba(0,180,255,0.25);
+        }
+
+        /* ══════════════════════════════════════
+           GRID KARTLARI
+           ══════════════════════════════════════ */
+        .comp-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.6rem;
+            margin: 0.8rem 0;
+        }
+        .comp-item {
+            background: linear-gradient(135deg, #f8f9fe, #f0f2fa);
+            border: 1px solid #e4e7f0;
+            border-radius: 10px;
+            padding: 0.7rem 0.9rem;
+        }
+        .comp-item strong {
+            color: #080818;
+            display: block;
+            margin-bottom: 0.1rem;
+            font-size: 0.85rem;
+        }
+        .comp-item span {
+            font-size: 0.75rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        /* ══════════════════════════════════════
+           SPEC BADGE'LER
+           ══════════════════════════════════════ */
+        .spec-badges {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin: 0.8rem 0;
+        }
+        .spec-badge {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.6rem 1rem;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #f0f7ff, #e8f0ff);
+            border: 1px solid rgba(0,180,255,0.12);
+            min-width: 85px;
+        }
+        .spec-badge .val {
+            font-size: 1.3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #00c8ff, #8c3cff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .spec-badge .lbl {
+            font-size: 0.6rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-top: 0.15rem;
+        }
+
+        /* ══════════════════════════════════════
+           PCB GÖRSELLERİ
+           ══════════════════════════════════════ */
+        .pcb-images {
+            display: flex;
+            gap: 0.8rem;
+            margin: 1rem 0;
+        }
+        .pcb-images img {
+            flex: 1;
+            max-width: 48%;
+            border-radius: 10px;
+            border: 1px solid #e0e4f0;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.06);
+        }
+
+        /* ══════════════════════════════════════
+           SAYFA FOOTER
+           ══════════════════════════════════════ */
+        .page-footer {
+            margin-top: 1.2rem;
+            padding: 0.6rem 0;
+            border-top: 1px solid #e8e8f0;
+            font-size: 0.6rem;
+            color: #aaa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .page-footer .ft-brand {
+            font-weight: 900;
+            color: #ccc;
+            letter-spacing: 0.5px;
+        }
+        .page-footer .ft-copy {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.55rem;
+            color: #ccc;
+        }
+
+        /* ══════════════════════════════════════
+           TELİF / COPYRIGHT ŞERİDİ
+           ══════════════════════════════════════ */
+        .copyright-bar {
+            background: linear-gradient(135deg, #080818, #101030);
+            color: rgba(255,255,255,0.5);
+            text-align: center;
+            padding: 0.4rem;
+            font-size: 0.55rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            border-top: 1px solid rgba(0,200,255,0.1);
+        }
+
+        /* ══════════════════════════════════════
+           İLETİŞİM KUTUSU
+           ══════════════════════════════════════ */
+        .contact-box {
+            text-align: center;
+            padding: 1.8rem 2rem;
+            background: linear-gradient(135deg, #080818, #101030);
+            border-radius: 16px;
+            color: #fff;
+            margin: 1.2rem 0;
+            border: 1px solid rgba(255,215,0,0.15);
+        }
+        .contact-box .cb-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: rgba(0,200,255,0.6);
+            margin-bottom: 0.8rem;
+        }
+        .contact-box .cb-names {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255,215,0,0.3);
+            margin-bottom: 0.8rem;
+            line-height: 1.3;
+        }
+        .contact-box .cb-line {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.55);
+            margin: 0.25rem 0;
+        }
+        .contact-box .cb-copy {
+            margin-top: 1rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.55rem;
+            color: rgba(255,255,255,0.2);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* ══════════════════════════════════════
+           TAKLİT ÖNLEME - KOPYA UYARISI
+           ══════════════════════════════════════ */
+        .anti-copy-notice {
+            margin: 0.8rem 0;
+            padding: 0.7rem 1rem;
+            border: 2px dashed rgba(0,0,0,0.08);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.65rem;
+            color: #999;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(0,0,0,0.008) 10px,
+                rgba(0,0,0,0.008) 20px
+            );
+        }
+        .anti-copy-notice strong { color: #666; }
+
+        /* ══════════════════════════════════════
+           HOLOGRAFİK ŞERİT (GÖRSEL)
+           ══════════════════════════════════════ */
+        .holo-strip {
+            height: 28px;
+            background: linear-gradient(
+                90deg,
+                rgba(0,200,255,0.06) 0%,
+                rgba(140,60,255,0.08) 15%,
+                rgba(255,215,0,0.06) 30%,
+                rgba(0,200,255,0.08) 45%,
+                rgba(140,60,255,0.06) 60%,
+                rgba(255,215,0,0.08) 75%,
+                rgba(0,200,255,0.06) 90%,
+                rgba(140,60,255,0.08) 100%
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.5rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: rgba(0,0,0,0.12);
+            text-transform: uppercase;
+            border-top: 1px solid rgba(0,0,0,0.04);
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+            font-family: 'JetBrains Mono', monospace;
+            overflow: hidden;
+        }
+
+        /* ══════════════════════════════════════
+           SEKTÖR KARTLARI
+           ══════════════════════════════════════ */
+        .sector-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.7rem;
+            margin: 0.6rem 0;
+        }
+        .sector-card {
+            border-radius: 14px;
+            padding: 1rem 1.1rem;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.06);
+        }
+        .sector-card::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 80px; height: 80px;
+            border-radius: 0 14px 0 80px;
+            opacity: 0.07;
+        }
+        .sector-card .sc-icon {
+            font-size: 2rem;
+            margin-bottom: 0.3rem;
+            line-height: 1;
+        }
+        .sector-card .sc-title {
+            font-size: 0.95rem;
+            font-weight: 900;
+            margin-bottom: 0.25rem;
+            letter-spacing: 0.2px;
+        }
+        .sector-card .sc-desc {
+            font-size: 0.72rem;
+            line-height: 1.5;
+            color: #555;
+            margin-bottom: 0.4rem;
+        }
+        .sector-card .sc-examples {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }
+        .sector-card .sc-tag {
+            display: inline-block;
+            font-size: 0.58rem;
+            font-weight: 700;
+            padding: 0.15rem 0.5rem;
+            border-radius: 20px;
+            letter-spacing: 0.3px;
+        }
+
+        /* Sektör renkleri */
+        .sc-green { background: linear-gradient(135deg, #f0fff4, #e0f8e6); }
+        .sc-green .sc-title { color: #1a6b35; }
+        .sc-green::before { background: #22c55e; }
+        .sc-green .sc-tag { background: rgba(34,197,94,0.12); color: #15803d; }
+
+        .sc-amber { background: linear-gradient(135deg, #fffbeb, #fef3c7); }
+        .sc-amber .sc-title { color: #92400e; }
+        .sc-amber::before { background: #f59e0b; }
+        .sc-amber .sc-tag { background: rgba(245,158,11,0.12); color: #92400e; }
+
+        .sc-blue { background: linear-gradient(135deg, #eff6ff, #dbeafe); }
+        .sc-blue .sc-title { color: #1e40af; }
+        .sc-blue::before { background: #3b82f6; }
+        .sc-blue .sc-tag { background: rgba(59,130,246,0.12); color: #1e40af; }
+
+        .sc-cyan { background: linear-gradient(135deg, #ecfeff, #cffafe); }
+        .sc-cyan .sc-title { color: #155e75; }
+        .sc-cyan::before { background: #06b6d4; }
+        .sc-cyan .sc-tag { background: rgba(6,182,212,0.12); color: #155e75; }
+
+        .sc-red { background: linear-gradient(135deg, #fef2f2, #fce7e7); }
+        .sc-red .sc-title { color: #991b1b; }
+        .sc-red::before { background: #ef4444; }
+        .sc-red .sc-tag { background: rgba(239,68,68,0.12); color: #991b1b; }
+
+        .sc-purple { background: linear-gradient(135deg, #faf5ff, #f3e8ff); }
+        .sc-purple .sc-title { color: #6b21a8; }
+        .sc-purple::before { background: #a855f7; }
+        .sc-purple .sc-tag { background: rgba(168,85,247,0.12); color: #6b21a8; }
+
+        .sc-teal { background: linear-gradient(135deg, #f0fdfa, #ccfbf1); }
+        .sc-teal .sc-title { color: #115e59; }
+        .sc-teal::before { background: #14b8a6; }
+        .sc-teal .sc-tag { background: rgba(20,184,166,0.12); color: #115e59; }
+
+        .sc-slate { background: linear-gradient(135deg, #f8fafc, #e2e8f0); }
+        .sc-slate .sc-title { color: #1e293b; }
+        .sc-slate::before { background: #64748b; }
+        .sc-slate .sc-tag { background: rgba(100,116,139,0.12); color: #334155; }
+
+        .sector-page-title {
+            font-size: 1.45rem;
+            font-weight: 900;
+            color: #080818;
+            margin: 0.8rem 0 0.2rem;
+            display: flex;
+            align-items: center;
+        }
+        .sector-page-subtitle {
+            font-size: 0.82rem;
+            color: #666;
+            margin-bottom: 0.6rem;
+        }
+
+        /* ══════════════════════════════════════
+           PRINT
+           ══════════════════════════════════════ */
+        @media print {
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Global Watermark -->
+<div class="watermark">
+    <div class="watermark-text wm1">HALİL DİNÇER &amp; OSMAN AKSOY</div>
+    <div class="watermark-text wm2">HALİL DİNÇER &amp; OSMAN AKSOY</div>
+    <div class="watermark-text wm3">HALİL DİNÇER &amp; OSMAN AKSOY</div>
+    <div class="watermark-text wm4">HALİL DİNÇER &amp; OSMAN AKSOY</div>
+    <div class="watermark-text wm5">HALİL DİNÇER &amp; OSMAN AKSOY</div>
+    <div class="watermark-text wm6">HALİL DİNÇER &amp; OSMAN AKSOY</div>
+</div>
+
+
+<!-- ████████████████████████████████████████
+     KAPAK SAYFASI
+     ████████████████████████████████████████ -->
+<div class="cover">
+    <div class="cover-gold-bar"></div>
+
+    <div class="cover-top">
+        <div class="cover-badge">
+            <span class="pulse"></span>
+            Teknik Doküman &bull; Rev 1.0 &bull; Şubat 2026
+        </div>
+        <div class="cover-voltage">
+            <span class="v-in">12V</span>
+            <span class="v-arr">&rarr;</span>
+            <span class="v-out">48V</span>
+        </div>
+        <div class="cover-type">DC-DC Boost Converter</div>
+    </div>
+
+    <div class="cover-visual">
+        <img src="pcb_3d_iso.png" class="cover-img" alt="PCB 3D Görünüm">
+    </div>
+
+    <div class="cover-gold-divider"></div>
+
+    <!-- ★★★ İSİMLER ★★★ -->
+    <div class="cover-names-section">
+        <div class="cover-names-label">Tasarım &amp; Geliştirme</div>
+        <div class="cover-name-line">HALİL DİNÇER</div>
+        <div class="cover-name-amp">&amp;</div>
+        <div class="cover-name-line">OSMAN AKSOY</div>
+        <p class="cover-desc">
+            Tarım makineleri ve endüstriyel uygulamalar için<br>
+            yüksek güçlü gerilim yükselten dönüştürücü kartı
+        </p>
+    </div>
+
+    <div class="cover-bottom-bar">
+        <span>Orijinal Doküman &bull; Tüm Hakları Saklıdır</span>
+        <span>&copy; 2026 Halil Dinçer &amp; Osman Aksoy</span>
+        <span class="cover-serial">SN: DA-2026-BC1248-001</span>
+    </div>
+    <div class="cover-gold-bar-bottom"></div>
+</div>
+
+
+<!-- ████████████████████████████████████████
+     SAYFA 1: GENEL BAKIŞ
+     ████████████████████████████████████████ -->
+<div class="page">
+<div class="page-watermark">Halil Dinçer &amp; Osman Aksoy</div>
+<div class="page-header">
+    <div class="hdr-left">
+        <div class="hdr-brand">12V→48V <span>Boost Converter</span></div>
+        <div class="hdr-serial">SN: DA-2026-BC1248-001</div>
+    </div>
+    <div class="hdr-authors">Halil Dinçer &amp; Osman Aksoy</div>
+</div>
+<div class="holo-strip">
+    DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL
+</div>
+<div class="content">
+
+<h2><span class="section-num">1</span> Genel Bakış</h2>
+
+<p>Bu kart, <strong>12V DC kaynaklardan</strong> (akü, güneş paneli vb.) <strong>48V DC çıkış</strong> üreten yüksek güçlü bir boost (yükselten) dönüştürücü kartıdır.</p>
+
+<div class="hl hl-blue">
+    <strong>Tasarımcılar:</strong> Bu ürün <strong>Halil Dinçer</strong> ve <strong>Osman Aksoy</strong> tarafından özgün olarak tasarlanmış, geliştirilmiş ve test edilmiştir. Tüm fikri mülkiyet hakları tasarımcılara aittir.
+</div>
+
+<div class="flow">
+    <div class="flow-box">12V Akü</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box main">Boost<br>Converter</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box">48V Motor</div>
+</div>
+
+<p>En yaygın kullanım alanı <strong>zeytin silkeleme makineleri</strong>dir. Traktörde veya kamyonette bulunan 12V akü, bu kart sayesinde 48V motorlu silkeleme makinesini besleyebilir.</p>
+
+<h3>Temel Özellikler</h3>
+
+<div class="spec-badges">
+    <div class="spec-badge"><span class="val">960W</span><span class="lbl">Maksimum Güç</span></div>
+    <div class="spec-badge"><span class="val">20A</span><span class="lbl">Giriş Akımı</span></div>
+    <div class="spec-badge"><span class="val">%94</span><span class="lbl">Verimlilik</span></div>
+    <div class="spec-badge"><span class="val">50kHz</span><span class="lbl">Frekans</span></div>
+    <div class="spec-badge"><span class="val">160mm</span><span class="lbl">Kart Boyu</span></div>
+</div>
+
+<table>
+    <tr><th>Parametre</th><th>Değer</th></tr>
+    <tr><td>Giriş Gerilimi</td><td>12V DC (10-14V aralık)</td></tr>
+    <tr><td>Çıkış Gerilimi</td><td>48V DC (ayarlanabilir)</td></tr>
+    <tr><td>Maksimum Güç</td><td>960W</td></tr>
+    <tr><td>Giriş Akımı</td><td>20A sürekli</td></tr>
+    <tr><td>Verimlilik</td><td>%90 - %94</td></tr>
+    <tr><td>Anahtarlama Frekansı</td><td>50 kHz</td></tr>
+    <tr><td>Kart Boyutu</td><td>160 × 100 mm</td></tr>
+</table>
+
+<h3>8 Farklı Sektörde Kullanım</h3>
+<div class="comp-grid">
+    <div class="comp-item">
+        <strong>&#127806; Tarım &amp; Hasat</strong>
+        <span>Zeytin silkeleme, ilaçlama, budama</span>
+    </div>
+    <div class="comp-item">
+        <strong>&#9728;&#65039; Güneş Enerjisi</strong>
+        <span>12V panel → 48V akü şarj</span>
+    </div>
+    <div class="comp-item">
+        <strong>&#9889; Elektrikli Araçlar</strong>
+        <span>E-bisiklet, golf aracı, scooter</span>
+    </div>
+    <div class="comp-item">
+        <strong>&#9875; Denizcilik</strong>
+        <span>Tekne motorları, balıkçılık</span>
+    </div>
+    <div class="comp-item">
+        <strong>&#127959;&#65039; İnşaat &amp; Şantiye</strong>
+        <span>Kırıcı, projektör, kaynak</span>
+    </div>
+    <div class="comp-item">
+        <strong>&#128225; Telekomünikasyon</strong>
+        <span>Baz istasyonu, UPS besleme</span>
+    </div>
+    <div class="comp-item">
+        <strong>&#127957;&#65039; Karavan &amp; Outdoor</strong>
+        <span>Off-road, kamp, taşınabilir güç</span>
+    </div>
+    <div class="comp-item">
+        <strong>&#9881;&#65039; Endüstriyel</strong>
+        <span>Otomasyon, servo, CNC besleme</span>
+    </div>
+</div>
+<p style="font-size:0.8rem;color:#666;text-align:center;font-style:italic;">Detaylı sektör bilgileri için Sayfa 2-3'e bakınız</p>
+
+<div class="page-footer">
+    <span class="ft-brand">Halil Dinçer &amp; Osman Aksoy</span>
+    <span>Sayfa 1/8</span>
+    <span class="ft-copy">&copy; 2026 Tüm Hakları Saklıdır</span>
+</div>
+</div>
+<div class="copyright-bar">&copy; 2026 Halil Dinçer &amp; Osman Aksoy &mdash; İzinsiz kopyalanması ve dağıtılması yasaktır</div>
+<div class="security-strip">HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001</div>
+</div>
+
+
+<!-- ████████████████████████████████████████
+     SAYFA 2: SEKTÖRLER (1-4)
+     ████████████████████████████████████████ -->
+<div class="page">
+<div class="page-watermark">Halil Dinçer &amp; Osman Aksoy</div>
+<div class="page-header">
+    <div class="hdr-left">
+        <div class="hdr-brand">12V→48V <span>Boost Converter</span></div>
+        <div class="hdr-serial">SN: DA-2026-BC1248-001</div>
+    </div>
+    <div class="hdr-authors">Halil Dinçer &amp; Osman Aksoy</div>
+</div>
+<div class="holo-strip">
+    DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL
+</div>
+<div class="content">
+
+<h2 class="sector-page-title"><span class="section-num">2</span> Kullanım Alanları</h2>
+<p class="sector-page-subtitle">12V→48V Boost Converter'ın çözüm sunduğu sektörler ve uygulama detayları</p>
+
+<div class="sector-grid">
+
+<!-- TARIM -->
+<div class="sector-card sc-green">
+    <div class="sc-icon">&#127806;</div>
+    <div class="sc-title">Tarım &amp; Zeytin Hasadı</div>
+    <div class="sc-desc">
+        Traktör veya kamyonetteki 12V aküden, 48V motorlu tarım aletlerini doğrudan çalıştırır.
+        Hasat sezonunda sahada kesintisiz güç sağlar. Ek jeneratör veya şarj ünitesi gerektirmez.
+        Tek bağlantıyla tüm sezon boyunca güvenilir performans.
+    </div>
+    <div class="sc-examples">
+        <span class="sc-tag">Zeytin Silkeleme</span>
+        <span class="sc-tag">İlaçlama Pompası</span>
+        <span class="sc-tag">Budama Makası</span>
+        <span class="sc-tag">Sulama Motoru</span>
+    </div>
+</div>
+
+<!-- GÜNEŞ ENERJİSİ -->
+<div class="sector-card sc-amber">
+    <div class="sc-icon">&#9728;&#65039;</div>
+    <div class="sc-title">Güneş Enerjisi &amp; Off-Grid</div>
+    <div class="sc-desc">
+        12V güneş panellerinden elde edilen enerjiyi 48V akü bankalarına yükselterek depolar.
+        Şebekeden bağımsız çiftlik, dağ evi ve yazlık evlerde güneş enerjisini
+        verimli şekilde kullanmanızı sağlar. Gece saatlerinde akü grubundan 48V ekipman besler.
+    </div>
+    <div class="sc-examples">
+        <span class="sc-tag">Panel→Akü Şarj</span>
+        <span class="sc-tag">Off-Grid Ev</span>
+        <span class="sc-tag">Çiftlik Sistemi</span>
+        <span class="sc-tag">Rüzgar Türbini</span>
+    </div>
+</div>
+
+<!-- ELEKTRİKLİ ARAÇLAR -->
+<div class="sector-card sc-blue">
+    <div class="sc-icon">&#9889;</div>
+    <div class="sc-title">Elektrikli Araçlar &amp; Mobilite</div>
+    <div class="sc-desc">
+        12V akü sistemlerinden 48V motorlu araçlara güç dönüşümü sağlar.
+        Elektrikli bisiklet, scooter, golf arabası ve küçük elektrikli araçlarda
+        motor sürücü beslemesi olarak kullanılır. Hafif yapısı sayesinde araca
+        ek yük bindirmeden yüksek verimle çalışır.
+    </div>
+    <div class="sc-examples">
+        <span class="sc-tag">E-Bisiklet</span>
+        <span class="sc-tag">Golf Aracı</span>
+        <span class="sc-tag">Elektrikli Scooter</span>
+        <span class="sc-tag">ATV / UTV</span>
+    </div>
+</div>
+
+<!-- DENİZCİLİK -->
+<div class="sector-card sc-cyan">
+    <div class="sc-icon">&#9875;</div>
+    <div class="sc-title">Denizcilik &amp; Balıkçılık</div>
+    <div class="sc-desc">
+        Tekne ve yatlardaki 12V akü sisteminden 48V elektrikli ekipmanlara güç sağlar.
+        Denizde jeneratör kullanmadan sessiz ve titreşimsiz çalışma imkanı sunar.
+        Tuzlu su ortamına dayanıklı bileşenler ve 30A sigorta koruması ile
+        deniz koşullarında güvenilir performans.
+    </div>
+    <div class="sc-examples">
+        <span class="sc-tag">Trolling Motor</span>
+        <span class="sc-tag">Balık Bulucu</span>
+        <span class="sc-tag">Elektrikli Vinç</span>
+        <span class="sc-tag">Radar Sistemi</span>
+    </div>
+</div>
+
+</div><!-- /sector-grid -->
+
+<div class="hl hl-blue" style="margin-top:0.6rem;">
+    <strong>Halil Dinçer &amp; Osman Aksoy farkı:</strong> Kartımız endüstriyel kalitede komponentler ve %94'e varan verimlilik ile tüm bu sektörlerde güvenle kullanılabilir. 30A sigorta koruması ve otomatik voltaj regülasyonu standart olarak dahildir.
+</div>
+
+<div class="page-footer">
+    <span class="ft-brand">Halil Dinçer &amp; Osman Aksoy</span>
+    <span>Sayfa 2/8</span>
+    <span class="ft-copy">&copy; 2026 Tüm Hakları Saklıdır</span>
+</div>
+</div>
+<div class="copyright-bar">&copy; 2026 Halil Dinçer &amp; Osman Aksoy &mdash; İzinsiz kopyalanması ve dağıtılması yasaktır</div>
+<div class="security-strip">HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001</div>
+</div>
+
+
+<!-- ████████████████████████████████████████
+     SAYFA 3: SEKTÖRLER (5-8)
+     ████████████████████████████████████████ -->
+<div class="page">
+<div class="page-watermark">Halil Dinçer &amp; Osman Aksoy</div>
+<div class="page-header">
+    <div class="hdr-left">
+        <div class="hdr-brand">12V→48V <span>Boost Converter</span></div>
+        <div class="hdr-serial">SN: DA-2026-BC1248-001</div>
+    </div>
+    <div class="hdr-authors">Halil Dinçer &amp; Osman Aksoy</div>
+</div>
+<div class="holo-strip">
+    DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL
+</div>
+<div class="content">
+
+<h2 class="sector-page-title"><span class="section-num">2</span> Kullanım Alanları (devam)</h2>
+<p class="sector-page-subtitle">Endüstriyel, telekomünikasyon, inşaat ve outdoor uygulamaları</p>
+
+<div class="sector-grid">
+
+<!-- İNŞAAT -->
+<div class="sector-card sc-red">
+    <div class="sc-icon">&#127959;&#65039;</div>
+    <div class="sc-title">İnşaat &amp; Şantiye</div>
+    <div class="sc-desc">
+        Şantiyelerde şebeke elektriği olmayan noktalarda 12V jeneratör veya akü sistemlerinden
+        48V güç üretir. Taşınabilir elektrikli el aletleri, LED projektörler ve
+        şantiye ekipmanlarını besler. Kompakt yapısıyla sahada kolayca taşınır
+        ve kurulum gerektirmez.
+    </div>
+    <div class="sc-examples">
+        <span class="sc-tag">Kırıcı / Delici</span>
+        <span class="sc-tag">LED Projektör</span>
+        <span class="sc-tag">Şarj İstasyonu</span>
+        <span class="sc-tag">Kaynak Makinesi</span>
+    </div>
+</div>
+
+<!-- TELEKOMÜNİKASYON -->
+<div class="sector-card sc-purple">
+    <div class="sc-icon">&#128225;</div>
+    <div class="sc-title">Telekomünikasyon &amp; Veri Merkezi</div>
+    <div class="sc-desc">
+        Baz istasyonları ve haberleşme röle noktalarında 12V yedek akü gruplarından
+        48V ekipman beslemesi sağlar. Kesintisiz güç kaynağı (UPS) sistemlerinde
+        yedek enerji dönüştürücü olarak kullanılır. Uzak kırsal alanlarda
+        şebeke bağımsız iletişim altyapısını destekler.
+    </div>
+    <div class="sc-examples">
+        <span class="sc-tag">Baz İstasyonu</span>
+        <span class="sc-tag">Röle Noktası</span>
+        <span class="sc-tag">UPS Sistemi</span>
+        <span class="sc-tag">PoE Switch</span>
+    </div>
+</div>
+
+<!-- KARAVAN & OUTDOOR -->
+<div class="sector-card sc-teal">
+    <div class="sc-icon">&#127957;&#65039;</div>
+    <div class="sc-title">Karavan &amp; Outdoor Yaşam</div>
+    <div class="sc-desc">
+        Karavan, tekerlekli ev ve off-road araçlarda 12V araç aküsünden 48V cihaz beslemesi yapar.
+        Doğada bağımsız yaşam için güneş paneli + bu kart kombinasyonu ile
+        şebekeden tamamen bağımsız enerji sistemi kurulabilir. Kamp alanlarında
+        güçlü elektrikli aletleri kullanmaya olanak tanır.
+    </div>
+    <div class="sc-examples">
+        <span class="sc-tag">Karavan Sistemi</span>
+        <span class="sc-tag">Off-Road Araç</span>
+        <span class="sc-tag">Kamp Aydınlatma</span>
+        <span class="sc-tag">Taşınabilir Güç</span>
+    </div>
+</div>
+
+<!-- ENDÜSTRİYEL -->
+<div class="sector-card sc-slate">
+    <div class="sc-icon">&#9881;&#65039;</div>
+    <div class="sc-title">Endüstriyel Otomasyon &amp; Atölye</div>
+    <div class="sc-desc">
+        Fabrika ve atölyelerde mevcut 12V DC hatlarından 48V endüstriyel ekipmanları besler.
+        PLC sistemleri, servo motorlar, konveyör bantları ve otomasyon kontrol üniteleri için
+        stabil güç sağlar. Gürültüsüz anahtarlama sayesinde hassas ölçüm
+        ve kontrol sistemlerini etkilemez.
+    </div>
+    <div class="sc-examples">
+        <span class="sc-tag">PLC / Otomasyon</span>
+        <span class="sc-tag">Servo Motor</span>
+        <span class="sc-tag">Konveyör Bant</span>
+        <span class="sc-tag">CNC Besleme</span>
+    </div>
+</div>
+
+</div><!-- /sector-grid -->
+
+<div class="hl hl-green" style="margin-top:0.6rem;">
+    <strong>8 farklı sektör, tek bir çözüm:</strong> DİNÇER &amp; AKSOY 12V→48V Boost Converter, 960W güç kapasitesi ve otomatik voltaj regülasyonu ile tüm bu alanlarda profesyonel seviyede performans sunar.
+</div>
+
+<div class="page-footer">
+    <span class="ft-brand">Halil Dinçer &amp; Osman Aksoy</span>
+    <span>Sayfa 3/8</span>
+    <span class="ft-copy">&copy; 2026 Tüm Hakları Saklıdır</span>
+</div>
+</div>
+<div class="copyright-bar">&copy; 2026 Halil Dinçer &amp; Osman Aksoy &mdash; İzinsiz kopyalanması ve dağıtılması yasaktır</div>
+<div class="security-strip">HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001</div>
+</div>
+
+
+<!-- ████████████████████████████████████████
+     SAYFA 4: NASIL ÇALIŞIYOR
+     ████████████████████████████████████████ -->
+<div class="page">
+<div class="page-watermark">Halil Dinçer &amp; Osman Aksoy</div>
+<div class="page-header">
+    <div class="hdr-left">
+        <div class="hdr-brand">12V→48V <span>Boost Converter</span></div>
+        <div class="hdr-serial">SN: DA-2026-BC1248-001</div>
+    </div>
+    <div class="hdr-authors">Halil Dinçer &amp; Osman Aksoy</div>
+</div>
+<div class="holo-strip">
+    DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL
+</div>
+<div class="content">
+
+<h2><span class="section-num">3</span> Nasıl Çalışıyor?</h2>
+
+<p>Boost converter, <strong>indüktör enerji depolama</strong> prensibine dayanan bir anahtarlamalı güç dönüştürücü tipidir. Düşük gerilimi yüksek gerilime çevirir.</p>
+
+<h3>Çalışma Prensibi (4 Adım)</h3>
+
+<ol class="step-list">
+    <li>
+        <strong>Enerji Depolama (MOSFET Açık)</strong><br>
+        TL494 kontrolcü, IRFP4110 MOSFET'i açık konuma getirir. Akünün akımı indüktör (L1) üzerinden akar ve indüktör manyetik alanında enerji depolar. Bu aşamada çıkışa enerji aktarımı yapılmaz.
+    </li>
+    <li>
+        <strong>Enerji Aktarımı (MOSFET Kapalı)</strong><br>
+        MOSFET kapanınca, indüktörde depolanan enerji serbest kalır. İndüktör gerilimi + giriş gerilimi birleşir ve çıkış gerilimini oluşturur. Enerji, Schottky diyot (D1) üzerinden çıkışa aktarılır.
+    </li>
+    <li>
+        <strong>Gerilim Ölçümü (Feedback)</strong><br>
+        Çıkıştaki R5 (100kΩ) ve R6 (5.6kΩ) voltaj bölücüsü, çıkış gerilimini ölçüp TL494'ün karşılaştırıcı girişine gönderir. TL494 bunu dahili 5V referans ile karşılaştırır.
+    </li>
+    <li>
+        <strong>Otomatik Ayarlama (PWM Kontrolü)</strong><br>
+        Çıkış gerilimi düşmüşse → PWM darbe genişliği artar → daha fazla enerji aktarılır<br>
+        Çıkış gerilimi artmışsa → PWM darbe genişliği azalır → daha az enerji aktarılır<br>
+        Bu döngü <strong>saniyede 50.000 kez</strong> tekrarlanır.
+    </li>
+</ol>
+
+<h3>Blok Şeması</h3>
+
+<div class="diagram">
+    <div class="diagram-title">Boost Converter Blok Diyagramı &mdash; DİNÇER &amp; AKSOY Tasarım</div>
+    <pre>
+    12V Akü          İndüktör (L1)         Diyot (D1)          48V Çıkış
+   ─────┤(+)├────────┤ 22µH ├──────┬───────┤ MBR40250G ├───┬──────┤(+)├────
+        │            └──────┘      │       └────────────┘   │      │
+        │                          │                    ┌───┴───┐  │
+        │                     ┌────┴────┐               │ C3,C4 │  │
+        │                     │ IRFP4110│               │2×470µF│  │
+        │                     │ MOSFET  │               └───┬───┘  │
+        │                     └────┬────┘                   │      │
+   ─────┤(-)├──────────────────────┴────────────────────────┴──────┤(-)├────
+                                                                   GND
+
+                          ┌─────────────┐
+    Çıkış Ölçümü ────────►│   TL494     │──── PWM ────► IR2110 ──► MOSFET Gate
+    (R5/R6 bölücüsü)      │  Kontrolcü  │
+    5V Referans ─────────►│             │
+                          └─────────────┘
+                       Geri Besleme Döngüsü</pre>
+</div>
+
+<div class="hl hl-green">
+    <strong>Anahtar Bilgi:</strong> TL494 kontrolcüsü, çıkış gerilimini sürekli izler ve MOSFET'in açık kalma süresini (duty cycle) ayarlayarak çıkışı sabit 48V'ta tutar. Bu işlem saniyede 50.000 kez gerçekleşir.
+</div>
+
+<div class="page-footer">
+    <span class="ft-brand">Halil Dinçer &amp; Osman Aksoy</span>
+    <span>Sayfa 4/8</span>
+    <span class="ft-copy">&copy; 2026 Tüm Hakları Saklıdır</span>
+</div>
+</div>
+<div class="copyright-bar">&copy; 2026 Halil Dinçer &amp; Osman Aksoy &mdash; İzinsiz kopyalanması ve dağıtılması yasaktır</div>
+<div class="security-strip">HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001</div>
+</div>
+
+
+<!-- ████████████████████████████████████████
+     SAYFA 3: VOLTAJ REGÜLASYONU
+     ████████████████████████████████████████ -->
+<div class="page">
+<div class="page-watermark">Halil Dinçer &amp; Osman Aksoy</div>
+<div class="page-header">
+    <div class="hdr-left">
+        <div class="hdr-brand">12V→48V <span>Boost Converter</span></div>
+        <div class="hdr-serial">SN: DA-2026-BC1248-001</div>
+    </div>
+    <div class="hdr-authors">Halil Dinçer &amp; Osman Aksoy</div>
+</div>
+<div class="holo-strip">
+    DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL
+</div>
+<div class="content">
+
+<h2><span class="section-num">4</span> Voltaj Regülasyonu</h2>
+
+<p>Kartın en önemli özelliklerinden biri, <strong>otomatik voltaj regülasyonu</strong>dur. Yük değişimlerinde çıkış gerilimini sabit tutmaya çalışır.</p>
+
+<h3>Geri Besleme Döngüsü</h3>
+
+<table>
+    <tr><th>Durum</th><th>Ne Olur?</th><th>TL494 Tepkisi</th></tr>
+    <tr>
+        <td><strong>Motor yük çekti</strong><br>(voltaj düşer)</td>
+        <td>Feedback sinyali azalır</td>
+        <td>PWM duty cycle artırılır<br>→ Daha fazla enerji pompalanır<br>→ Voltaj geri yükselir</td>
+    </tr>
+    <tr>
+        <td><strong>Yük azaldı</strong><br>(voltaj yükselir)</td>
+        <td>Feedback sinyali artar</td>
+        <td>PWM duty cycle azaltılır<br>→ Daha az enerji pompalanır<br>→ Voltaj geri düşer</td>
+    </tr>
+    <tr>
+        <td><strong>Normal çalışma</strong></td>
+        <td>Feedback = Referans</td>
+        <td>Sabit duty cycle<br>→ Voltaj stabil kalır</td>
+    </tr>
+</table>
+
+<h3>Regülasyon Hızı</h3>
+
+<p>Anahtarlama frekansı 50kHz olduğu için, kontrol döngüsü her <strong>20 mikrosaniyede</strong> bir çıkış gerilimini kontrol eder ve gerekirse düzeltir.</p>
+
+<div class="diagram">
+    <div class="diagram-title">Voltaj Regülasyon Süreci</div>
+    <pre>
+    Çıkış: 48V ────┐
+                   │
+              ┌────┴────┐
+              │  R5=100kΩ│ Voltaj Bölücüsü
+              ├─────────┤ Vfb = 48 × 5.6/105.6 = 2.54V
+              │  R6=5.6kΩ│
+              └────┬────┘
+                   │
+              ┌────┴────┐
+              │  TL494  │ Karşılaştırma: Vfb vs Vref(2.5V)
+              │ 1IN+ vs │ Eşitse → Sabit PWM
+              │ 1IN-    │ Düşükse → PWM Artır
+              └────┬────┘ Yüksekse → PWM Azalt
+              ┌────┴────┐
+              │ IR2110  │ Gate Driver
+              └────┬────┘
+              ┌────┴────┐
+              │IRFP4110 │ Güç Anahtarı
+              └─────────┘</pre>
+</div>
+
+<h3>Ani Yük Değişimleri (Transient)</h3>
+
+<p>Zeytin silkeleme makinesi gibi motorlu yüklerde, özellikle <strong>ilk çalıştırma anında</strong> çok yüksek akımlar çekilir:</p>
+
+<div class="comp-grid">
+    <div class="comp-item">
+        <strong>Giriş Tamponu</strong>
+        <span>2200µF elektrolitik kapasitör, akım darbelerini yumuşatır</span>
+    </div>
+    <div class="comp-item">
+        <strong>Çıkış Tamponu</strong>
+        <span>2× 470µF kapasitör, yük darbelerinde enerji deposu</span>
+    </div>
+    <div class="comp-item">
+        <strong>Hızlı Diyot</strong>
+        <span>MBR40250G Schottky, anahtarlama kayıplarını azaltır</span>
+    </div>
+    <div class="comp-item">
+        <strong>Sigorta Koruması</strong>
+        <span>30A blade sigorta, aşırı akımda devreyi korur</span>
+    </div>
+</div>
+
+<div class="hl hl-orange">
+    <strong>Önemli Not:</strong> Ağır motor yüklerinde ilk çalıştırma anında kısa süreli voltaj dalgalanması yaşanabilir. Bu normaldir ve kapasitörler sayesinde hızla toparlanır.
+</div>
+
+<div class="page-footer">
+    <span class="ft-brand">Halil Dinçer &amp; Osman Aksoy</span>
+    <span>Sayfa 5/8</span>
+    <span class="ft-copy">&copy; 2026 Tüm Hakları Saklıdır</span>
+</div>
+</div>
+<div class="copyright-bar">&copy; 2026 Halil Dinçer &amp; Osman Aksoy &mdash; İzinsiz kopyalanması ve dağıtılması yasaktır</div>
+<div class="security-strip">HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001</div>
+</div>
+
+
+<!-- ████████████████████████████████████████
+     SAYFA 4: BOM
+     ████████████████████████████████████████ -->
+<div class="page">
+<div class="page-watermark">Halil Dinçer &amp; Osman Aksoy</div>
+<div class="page-header">
+    <div class="hdr-left">
+        <div class="hdr-brand">12V→48V <span>Boost Converter</span></div>
+        <div class="hdr-serial">SN: DA-2026-BC1248-001</div>
+    </div>
+    <div class="hdr-authors">Halil Dinçer &amp; Osman Aksoy</div>
+</div>
+<div class="holo-strip">
+    DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL
+</div>
+<div class="content">
+
+<h2><span class="section-num">5</span> Komponent Listesi (BOM)</h2>
+
+<p><strong>25 adet</strong> Through-Hole komponent ile kolay montaj ve yüksek güvenilirlik.</p>
+
+<table>
+    <tr><th>Ref</th><th>Değer</th><th>Paket</th><th>Açıklama</th></tr>
+    <tr><td><strong>J1</strong></td><td>12V_IN</td><td>Terminal 5.08mm</td><td>Giriş terminal bloğu</td></tr>
+    <tr><td><strong>F1</strong></td><td>30A</td><td>Blade ATO</td><td>Sigorta tutucu + sigorta</td></tr>
+    <tr><td><strong>C1</strong></td><td>2200µF/25V</td><td>Radial 16mm</td><td>Giriş filtre kapasitörü</td></tr>
+    <tr><td><strong>C2</strong></td><td>100nF</td><td>Disk 5mm</td><td>Yüksek frekans filtre</td></tr>
+    <tr><td><strong>L1</strong></td><td>22µH</td><td>Toroid 25mm</td><td>Güç indüktörü (demir tozu)</td></tr>
+    <tr><td><strong>Q1</strong></td><td>IRFP4110</td><td>TO-247-3</td><td>N-MOSFET (100V, 180A)</td></tr>
+    <tr><td><strong>D1</strong></td><td>MBR40250G</td><td>TO-247-2</td><td>Schottky diyot (250V, 40A)</td></tr>
+    <tr><td><strong>C3</strong></td><td>470µF/63V</td><td>Radial 12.5mm</td><td>Çıkış kapasitörü 1</td></tr>
+    <tr><td><strong>C4</strong></td><td>470µF/63V</td><td>Radial 12.5mm</td><td>Çıkış kapasitörü 2</td></tr>
+    <tr><td><strong>J2</strong></td><td>48V_OUT</td><td>Terminal 5.08mm</td><td>Çıkış terminal bloğu</td></tr>
+    <tr><td><strong>U1</strong></td><td>TL494</td><td>DIP-16</td><td>PWM kontrolcü</td></tr>
+    <tr><td><strong>U2</strong></td><td>IR2110</td><td>DIP-14</td><td>MOSFET gate driver</td></tr>
+    <tr><td><strong>R1</strong></td><td>10kΩ</td><td>Axial</td><td>Zamanlama direnci (RT)</td></tr>
+    <tr><td><strong>R2</strong></td><td>47kΩ</td><td>Axial</td><td>Ölü zaman direnci (DTC)</td></tr>
+    <tr><td><strong>R3</strong></td><td>10Ω</td><td>Axial</td><td>Gate direnci</td></tr>
+    <tr><td><strong>R4</strong></td><td>10kΩ</td><td>Axial</td><td>Gate pull-down</td></tr>
+    <tr><td><strong>R5</strong></td><td>100kΩ</td><td>Axial</td><td>Feedback bölücüsü (üst)</td></tr>
+    <tr><td><strong>R6</strong></td><td>5.6kΩ</td><td>Axial</td><td>Feedback bölücüsü (alt)</td></tr>
+    <tr><td><strong>R7</strong></td><td>10kΩ</td><td>Axial</td><td>Referans bölücüsü (üst)</td></tr>
+    <tr><td><strong>R8</strong></td><td>10kΩ</td><td>Axial</td><td>Referans bölücüsü (alt)</td></tr>
+    <tr><td><strong>C5</strong></td><td>100nF</td><td>Disk 5mm</td><td>VREF bypass kapasitörü</td></tr>
+    <tr><td><strong>C6</strong></td><td>1nF</td><td>Disk 3mm</td><td>Zamanlama kapasitörü (CT)</td></tr>
+    <tr><td><strong>C7</strong></td><td>100nF</td><td>Disk 5mm</td><td>IR2110 VCC bypass</td></tr>
+    <tr><td><strong>C8</strong></td><td>1µF</td><td>Disk 5mm</td><td>Bootstrap kapasitörü</td></tr>
+    <tr><td><strong>D2</strong></td><td>1N4148</td><td>DO-35</td><td>Bootstrap diyotu</td></tr>
+</table>
+
+<div class="hl hl-blue">
+    <strong>Not:</strong> Tüm komponentler Through-Hole (delikli montaj) tipindedir. SMD deneyimi gerektirmez, standart havya ile kolayca lehimlenebilir.
+</div>
+
+<div class="anti-copy-notice">
+    <strong>Bu doküman Halil Dinçer ve Osman Aksoy'a aittir.</strong><br>
+    Doküman No: DA-2026-BC1248-001 &bull; İzinsiz çoğaltılması, dağıtılması veya ticari amaçla kullanılması kanunen yasaktır.
+</div>
+
+<div class="page-footer">
+    <span class="ft-brand">Halil Dinçer &amp; Osman Aksoy</span>
+    <span>Sayfa 6/8</span>
+    <span class="ft-copy">&copy; 2026 Tüm Hakları Saklıdır</span>
+</div>
+</div>
+<div class="copyright-bar">&copy; 2026 Halil Dinçer &amp; Osman Aksoy &mdash; İzinsiz kopyalanması ve dağıtılması yasaktır</div>
+<div class="security-strip">HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001</div>
+</div>
+
+
+<!-- ████████████████████████████████████████
+     SAYFA 5: PCB ve MONTAJ
+     ████████████████████████████████████████ -->
+<div class="page">
+<div class="page-watermark">Halil Dinçer &amp; Osman Aksoy</div>
+<div class="page-header">
+    <div class="hdr-left">
+        <div class="hdr-brand">12V→48V <span>Boost Converter</span></div>
+        <div class="hdr-serial">SN: DA-2026-BC1248-001</div>
+    </div>
+    <div class="hdr-authors">Halil Dinçer &amp; Osman Aksoy</div>
+</div>
+<div class="holo-strip">
+    DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL
+</div>
+<div class="content">
+
+<h2><span class="section-num">6</span> PCB Tasarımı ve Montaj</h2>
+
+<h3>PCB Özellikleri</h3>
+<table>
+    <tr><th>Parametre</th><th>Değer</th></tr>
+    <tr><td>Boyut</td><td>160 × 100 mm</td></tr>
+    <tr><td>Katman</td><td>2 (Ön yüz + Arka yüz)</td></tr>
+    <tr><td>Malzeme</td><td>FR4, 1.6mm kalınlık</td></tr>
+    <tr><td>Bakır Kalınlığı</td><td>1 oz (35µm)</td></tr>
+    <tr><td>Ön Yüz (F.Cu)</td><td>Güç yolu izleri (3mm genişlik)</td></tr>
+    <tr><td>Arka Yüz (B.Cu)</td><td>GND bakır döküm + sinyal izleri</td></tr>
+    <tr><td>Montaj Delikleri</td><td>4× M3 (köşelerde)</td></tr>
+    <tr><td>İz Sayısı</td><td>110 track, 38 via</td></tr>
+</table>
+
+<h3>3D Görünümler</h3>
+<div class="pcb-images">
+    <img src="pcb_3d_iso.png" alt="İzometrik görünüm">
+    <img src="pcb_3d_top.png" alt="Üst görünüm">
+</div>
+<p style="text-align:center;font-size:0.7rem;color:#888;margin-top:0.2rem;font-weight:700;">
+    Halil Dinçer &amp; Osman Aksoy tarafından KiCad 9.0 ile tasarlanmıştır
+</p>
+
+<h3>Montaj Talimatları</h3>
+
+<ol class="step-list">
+    <li>
+        <strong>Soğutucular</strong><br>
+        Q1 (IRFP4110) ve D1 (MBR40250G) mutlaka alüminyum soğutucuya montaj edilmelidir. Termal macun kullanınız.
+    </li>
+    <li>
+        <strong>Kablo Bağlantıları</strong><br>
+        Giriş kabloları en az 4mm² kesitinde olmalıdır (20A için). Çıkış kabloları 2.5mm² yeterlidir.
+    </li>
+    <li>
+        <strong>Terminal Bağlantıları</strong><br>
+        J1: Kırmızı (+12V), Siyah (GND) &nbsp;|&nbsp; J2: Kırmızı (+48V), Siyah (GND)
+    </li>
+    <li>
+        <strong>Mekanik Montaj</strong><br>
+        M3 vidalar ile metalik yüzeye sabitleyin. Titreşim amortisörü tavsiye edilir.
+    </li>
+</ol>
+
+<div class="hl hl-red">
+    <strong>UYARI:</strong> Kartı ilk çalıştırmadan önce multimetre ile giriş kutuplarını kontrol edin. Ters kutup bağlantısı kartı kalıcı olarak hasar verebilir!
+</div>
+
+<div class="page-footer">
+    <span class="ft-brand">Halil Dinçer &amp; Osman Aksoy</span>
+    <span>Sayfa 7/8</span>
+    <span class="ft-copy">&copy; 2026 Tüm Hakları Saklıdır</span>
+</div>
+</div>
+<div class="copyright-bar">&copy; 2026 Halil Dinçer &amp; Osman Aksoy &mdash; İzinsiz kopyalanması ve dağıtılması yasaktır</div>
+<div class="security-strip">HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001</div>
+</div>
+
+
+<!-- ████████████████████████████████████████
+     SAYFA 6: BAĞLANTI, GARANTİ, İLETİŞİM
+     ████████████████████████████████████████ -->
+<div class="page">
+<div class="page-watermark">Halil Dinçer &amp; Osman Aksoy</div>
+<div class="page-header">
+    <div class="hdr-left">
+        <div class="hdr-brand">12V→48V <span>Boost Converter</span></div>
+        <div class="hdr-serial">SN: DA-2026-BC1248-001</div>
+    </div>
+    <div class="hdr-authors">Halil Dinçer &amp; Osman Aksoy</div>
+</div>
+<div class="holo-strip">
+    DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL•DİNÇER•AKSOY•ORİJİNAL
+</div>
+<div class="content">
+
+<h2><span class="section-num">7</span> Bağlantı Şeması</h2>
+
+<div class="diagram">
+    <div class="diagram-title">Sistem Bağlantı Diyagramı</div>
+    <pre>
+    ┌──────────────┐                              ┌──────────────┐
+    │              │   Kırmızı(+) 4mm²            │              │
+    │  12V AKÜ     ├──────────────────────┐       │  48V MOTOR   │
+    │  (Traktör/   │                      │       │  (Silkeleme  │
+    │   Kamyonet)  │   ┌──────────────────┤       │   Makinesi)  │
+    │              │   │    Siyah(-) 4mm²  │       │              │
+    └──────┬───────┘   │                  │       └──────┬───────┘
+           │           │  ┌───────────┐   │              │
+           │           │  │  BOOST    │   │   Kırmızı(+) │
+           └───────────┴──┤  12V→48V  ├───┴──────────────┘
+                          │  CONVERTER│   2.5mm²
+               GND ───────┤  DİNÇER  ├──────── GND
+                          │  &amp; AKSOY │
+                          └───────────┘
+
+    Giriş (J1):                    Çıkış (J2):
+    Pin 1: +12V (Kırmızı)         Pin 1: +48V (Kırmızı)
+    Pin 2: GND  (Siyah)           Pin 2: GND  (Siyah)</pre>
+</div>
+
+<h2><span class="section-num">8</span> Sorun Giderme</h2>
+
+<table>
+    <tr><th>Sorun</th><th>Olası Neden</th><th>Çözüm</th></tr>
+    <tr><td>Kart çalışmıyor</td><td>Sigorta atmış</td><td>F1 sigortayı kontrol edin</td></tr>
+    <tr><td>Çıkış voltajı düşük</td><td>Aşırı yük</td><td>Yükü azaltın, kablo kontrolü</td></tr>
+    <tr><td>Kart çok ısınıyor</td><td>Soğutucu yok/yetersiz</td><td>Q1 ve D1'e soğutucu takın</td></tr>
+    <tr><td>Çıkış voltajı salınıyor</td><td>Kapasitör arızası</td><td>C3, C4 kapasitörleri kontrol</td></tr>
+    <tr><td>Giriş sigortası atıyor</td><td>Kısa devre / aşırı yük</td><td>Bağlantıları kontrol edin</td></tr>
+</table>
+
+<h2><span class="section-num">9</span> Garanti ve Destek</h2>
+
+<div class="hl hl-green">
+    <strong>Garanti Koşulları:</strong>
+    <ul style="margin-top:0.4rem;padding-left:1.5rem;font-size:0.88rem;">
+        <li>Üretim hatalarına karşı <strong>1 yıl garanti</strong></li>
+        <li>Yanlış kullanım (ters kutup, aşırı yük) garanti dışıdır</li>
+        <li>Teknik destek: Telefon ve WhatsApp ile 7/24</li>
+    </ul>
+</div>
+
+<!-- ★★★ BÜYÜK İLETİŞİM KUTUSU ★★★ -->
+<div class="contact-box">
+    <div class="cb-label">Sipariş &amp; Teknik Destek</div>
+    <div class="cb-names">Halil Dinçer<br>&amp; Osman Aksoy</div>
+    <div class="cb-line">WhatsApp: 0 5XX XXX XX XX</div>
+    <div class="cb-line">E-posta: info@example.com</div>
+    <div class="cb-line">Telefon: 0 5XX XXX XX XX</div>
+    <div class="cb-copy">
+        Doküman No: DA-2026-BC1248-001 &bull; Orijinal Kopya &bull; Tüm Hakları Saklıdır
+    </div>
+</div>
+
+<div class="anti-copy-notice">
+    <strong>FİKRİ MÜLKİYET UYARISI</strong><br>
+    Bu doküman ve içerdiği tüm tasarım bilgileri, devre şemaları, PCB çizimleri ve teknik detaylar
+    <strong>Halil Dinçer</strong> ve <strong>Osman Aksoy</strong>'un fikri mülkiyetindedir.<br>
+    İzinsiz kopyalanması, çoğaltılması, dağıtılması veya ticari amaçla kullanılması
+    5846 sayılı Fikir ve Sanat Eserleri Kanunu kapsamında yasal işleme tabidir.<br>
+    <strong>Doküman No: DA-2026-BC1248-001</strong>
+</div>
+
+<div class="page-footer">
+    <span class="ft-brand">Halil Dinçer &amp; Osman Aksoy</span>
+    <span>Sayfa 8/8</span>
+    <span class="ft-copy">&copy; 2026 Tüm Hakları Saklıdır</span>
+</div>
+</div>
+<div class="copyright-bar">&copy; 2026 Halil Dinçer &amp; Osman Aksoy &mdash; İzinsiz kopyalanması ve dağıtılması yasaktır</div>
+<div class="security-strip">HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001•HALİLDİNÇER•OSMANAKSOY•ORİJİNALDOKÜMAN•DA2026BC1248001</div>
+</div>
+
+</body>
+</html>

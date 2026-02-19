@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>12V → 24-33V Boost Converter | Ayarlanabilir DC-DC Donusturucu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #0a1628;
+            --accent: #00d4ff;
+            --accent2: #7b2dff;
+            --gold: #ffd700;
+            --text: #e0e8f0;
+            --card-bg: rgba(255,255,255,0.04);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--primary);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Animated background */
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image:
+                linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-glow {
+            position: fixed;
+            width: 600px; height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .bg-glow-1 { top: -200px; right: -100px; background: var(--accent); }
+        .bg-glow-2 { bottom: -200px; left: -100px; background: var(--accent2); }
+
+        section { position: relative; z-index: 1; }
+
+        /* Navigation */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 100;
+            background: rgba(10,22,40,0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0,212,255,0.1);
+            padding: 0.8rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .logo {
+            font-size: 1.4rem; font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+        .logo span { font-weight: 400; opacity: 0.7; }
+        nav a {
+            color: var(--text); text-decoration: none; margin-left: 2rem;
+            font-size: 0.9rem; opacity: 0.7; transition: all 0.3s;
+        }
+        nav a:hover { opacity: 1; color: var(--accent); }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            padding: 6rem 2rem 4rem;
+            text-align: center;
+        }
+        .hero-content { max-width: 900px; }
+
+        .badge {
+            display: inline-block;
+            padding: 0.4rem 1.2rem;
+            border: 1px solid rgba(0,212,255,0.3);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--accent);
+            margin-bottom: 2rem;
+            background: rgba(0,212,255,0.05);
+            animation: pulse-border 3s ease-in-out infinite;
+        }
+        @keyframes pulse-border {
+            0%, 100% { border-color: rgba(0,212,255,0.3); }
+            50% { border-color: rgba(0,212,255,0.7); }
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -1px;
+        }
+        h1 .voltage {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        h1 .arrow {
+            display: inline-block;
+            color: var(--gold);
+            -webkit-text-fill-color: var(--gold);
+            animation: arrow-move 2s ease-in-out infinite;
+            margin: 0 0.3rem;
+        }
+        @keyframes arrow-move {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(8px); }
+        }
+
+        .hero-desc {
+            font-size: 1.25rem;
+            color: rgba(224,232,240,0.6);
+            max-width: 650px;
+            margin: 0 auto 2.5rem;
+        }
+
+        /* Voltage display */
+        .voltage-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        .volt-box {
+            background: var(--card-bg);
+            border: 1px solid rgba(0,212,255,0.15);
+            border-radius: 16px;
+            padding: 1.5rem 2.5rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        .volt-box .value {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent), #fff);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .volt-box .unit { font-size: 1.5rem; opacity: 0.5; }
+        .volt-box .label {
+            font-size: 0.85rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 0.3rem;
+        }
+        .volt-arrow {
+            font-size: 2.5rem;
+            color: var(--gold);
+            animation: arrow-move 2s ease-in-out infinite;
+        }
+
+        /* CTA buttons */
+        .cta-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .btn {
+            padding: 1rem 2.5rem;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            box-shadow: 0 4px 30px rgba(0,212,255,0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 40px rgba(0,212,255,0.5);
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .btn-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(0,212,255,0.05);
+        }
+
+        /* Stats bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1px;
+            background: rgba(0,212,255,0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            max-width: 900px;
+            margin: 4rem auto 0;
+        }
+        .stat-item {
+            background: rgba(10,22,40,0.8);
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--accent);
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.5;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.3rem;
+        }
+
+        /* Features */
+        .features {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        .section-title h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+        .section-title p {
+            color: rgba(224,232,240,0.5);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .feature-card:hover {
+            border-color: rgba(0,212,255,0.2);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .feature-card:hover::before { opacity: 1; }
+
+        .feature-icon {
+            width: 56px; height: 56px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.2rem;
+            background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(123,45,255,0.1));
+            border: 1px solid rgba(0,212,255,0.15);
+        }
+        .feature-card h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .feature-card p {
+            font-size: 0.9rem;
+            color: rgba(224,232,240,0.5);
+            line-height: 1.7;
+        }
+
+        /* Specs */
+        .specs {
+            padding: 6rem 2rem;
+            background: rgba(0,212,255,0.02);
+            border-top: 1px solid rgba(0,212,255,0.05);
+            border-bottom: 1px solid rgba(0,212,255,0.05);
+        }
+        .specs-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .specs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+        }
+        .specs-table tr {
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: background 0.3s;
+        }
+        .specs-table tr:hover { background: rgba(0,212,255,0.03); }
+        .specs-table td {
+            padding: 1rem 1.5rem;
+            font-size: 0.95rem;
+        }
+        .specs-table td:first-child {
+            color: rgba(224,232,240,0.5);
+            width: 40%;
+            font-weight: 500;
+        }
+        .specs-table td:last-child {
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        /* Use cases */
+        .usecases {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .usecase-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        .usecase-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.4s;
+        }
+        .usecase-card:hover {
+            border-color: rgba(0,212,255,0.3);
+            transform: translateY(-4px);
+        }
+        .usecase-card .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .usecase-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        .usecase-card p {
+            font-size: 0.85rem;
+            color: rgba(224,232,240,0.4);
+        }
+
+        /* PCB Preview */
+        .pcb-section {
+            padding: 6rem 2rem;
+            text-align: center;
+        }
+        .pcb-gallery {
+            max-width: 1000px;
+            margin: 3rem auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        @media (max-width: 768px) {
+            .pcb-gallery { grid-template-columns: 1fr; }
+        }
+        .pcb-img-wrap {
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(0,212,255,0.15);
+            background: #0d1f35;
+            transition: all 0.4s;
+            position: relative;
+        }
+        .pcb-img-wrap:hover {
+            border-color: rgba(0,212,255,0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        .pcb-img-wrap img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .pcb-img-label {
+            padding: 1rem;
+            font-size: 0.85rem;
+            color: rgba(224,232,240,0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+            background: rgba(0,0,0,0.3);
+        }
+
+        /* Pricing */
+        .pricing {
+            padding: 6rem 2rem;
+            text-align: center;
+        }
+        .price-card {
+            max-width: 500px;
+            margin: 3rem auto;
+            background: var(--card-bg);
+            border: 2px solid rgba(0,212,255,0.2);
+            border-radius: 24px;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .price-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--accent2), var(--gold));
+        }
+        .price-tag {
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent), #fff);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .price-tag .currency { font-size: 1.5rem; vertical-align: top; }
+        .price-includes {
+            list-style: none;
+            margin: 2rem 0;
+            text-align: left;
+        }
+        .price-includes li {
+            padding: 0.6rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.95rem;
+        }
+        .price-includes li .check {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .price-note {
+            font-size: 0.8rem;
+            color: rgba(224,232,240,0.3);
+            margin-top: 1.5rem;
+        }
+
+        /* Contact */
+        .contact {
+            padding: 6rem 2rem;
+            text-align: center;
+            background: rgba(0,212,255,0.02);
+            border-top: 1px solid rgba(0,212,255,0.05);
+        }
+        .contact-methods {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        .contact-item {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 1.5rem 2.5rem;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .contact-item:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+        .contact-item .icon { font-size: 1.5rem; }
+
+        /* Footer */
+        footer {
+            padding: 2rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: rgba(224,232,240,0.2);
+            border-top: 1px solid rgba(255,255,255,0.03);
+        }
+
+        /* Scroll animations */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav { padding: 0.6rem 1rem; }
+            nav a { margin-left: 1rem; font-size: 0.8rem; }
+            .voltage-display { flex-direction: column; gap: 1rem; }
+            .volt-box .value { font-size: 2.5rem; }
+            .hero { padding: 5rem 1.5rem 3rem; }
+            .features, .specs, .usecases, .pcb-section, .pricing, .contact { padding: 4rem 1.5rem; }
+            .price-tag { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-glow bg-glow-1"></div>
+<div class="bg-glow bg-glow-2"></div>
+
+<!-- Navigation -->
+<nav>
+    <div class="logo">BOOST<span>POWER</span></div>
+    <div>
+        <a href="#ozellikler">Ozellikler</a>
+        <a href="#teknik">Teknik</a>
+        <a href="#karsilastirma">Karsilastirma</a>
+        <a href="#fiyat">Fiyat</a>
+        <a href="#iletisim">Iletisim</a>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-content">
+        <div class="badge">Ayarlanabilir Cikis &bull; Profesyonel Tasarim</div>
+        <h1>
+            <span class="voltage">12V</span>
+            <span class="arrow">&rarr;</span>
+            <span class="voltage">24-33V</span>
+            <br>Boost Converter
+        </h1>
+        <p class="hero-desc">
+            Tarim makineleri, elektrikli araclar ve endustriyel uygulamalar icin
+            tasarlanmis profesyonel DC-DC yukselten donusturucu karti.
+            Multiturn trimpot ile hassas voltaj ayari.
+        </p>
+
+        <div class="voltage-display">
+            <div class="volt-box">
+                <div class="value">12<span class="unit">V</span></div>
+                <div class="label">Giris</div>
+            </div>
+            <div class="volt-arrow">&rarr;</div>
+            <div class="volt-box">
+                <div class="value">33-53<span class="unit">V</span></div>
+                <div class="label">Ayarlanabilir Cikis</div>
+            </div>
+        </div>
+
+        <div class="cta-group">
+            <a href="#fiyat" class="btn btn-primary">Satin Al</a>
+            <a href="#teknik" class="btn btn-outline">Teknik Detaylar</a>
+        </div>
+
+        <div class="stats-bar fade-up">
+            <div class="stat-item">
+                <div class="stat-value">960W</div>
+                <div class="stat-label">Maks. Guc</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">20A</div>
+                <div class="stat-label">Giris Akimi</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">%92+</div>
+                <div class="stat-label">Verimlilik</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">110x80</div>
+                <div class="stat-label">mm Kompakt</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<section class="features" id="ozellikler">
+    <div class="section-title fade-up">
+        <h2>Neden Bu Kart?</h2>
+        <p>Endustriyel kalitede tasarim, guclu komponentler ve uzun omurlu yapiyla fark yaratin</p>
+    </div>
+    <div class="features-grid">
+        <div class="feature-card fade-up">
+            <div class="feature-icon">&#9889;</div>
+            <h3>Yuksek Guc Kapasitesi</h3>
+            <p>IRFP4110 MOSFET ve MBR40250G Schottky diyot ile 960W'a kadar guc cikisi. 20A giris akimini rahatliklа tasiyor.</p>
+        </div>
+        <div class="feature-card fade-up">
+            <div class="feature-icon">&#9881;</div>
+            <h3>Profesyonel PWM Kontrolu</h3>
+            <p>TL494 PWM kontrolcu + IR2110 gate driver ile hassas gerilim regulasyonu. Kararli ve guvenilir calisma.</p>
+        </div>
+        <div class="feature-card fade-up">
+            <div class="feature-icon">&#128296;</div>
+            <h3>THT Komponentler</h3>
+            <p>Tum komponentler delikli montaj (Through-Hole). Kolay tamir, uzun omur ve titresime dayanikli yapilar icin ideal.</p>
+        </div>
+        <div class="feature-card fade-up">
+            <div class="feature-icon">&#127777;</div>
+            <h3>Termal Yonetim</h3>
+            <p>Genis bakir dokum alani ile etkin isi dagitimi. TO-247 paket MOSFET ve diyot, harici sogutucu montajina uygun.</p>
+        </div>
+        <div class="feature-card fade-up">
+            <div class="feature-icon">&#128274;</div>
+            <h3>Koruma Devreleri</h3>
+            <p>30A sigorta ile asiri akim korumasi. Geri besleme dongusu ile cikis gerilimi kontrolu ve asiri gerilim korumasi.</p>
+        </div>
+        <div class="feature-card fade-up">
+            <div class="feature-icon">&#128230;</div>
+            <h3>Kompakt Tasarim</h3>
+            <p>110x80mm, 2 katmanli PCB uzerinde tum devre. Makinelere kolayca sigacak boyut. Vidalanabilir terminal bloklari.</p>
+        </div>
+        <div class="feature-card fade-up">
+            <div class="feature-icon">&#127911;</div>
+            <h3>Ayarlanabilir Cikis Gerilimi</h3>
+            <p>Bourns 3296W multiturn trimpot ile 24V - 33V arasi hassas voltaj ayari. Titresimde kaymaz, profesyonel kalibrasyon.</p>
+        </div>
+        <div class="feature-card fade-up">
+            <div class="feature-icon">&#128161;</div>
+            <h3>LED Durum Gostergeleri</h3>
+            <p>Yesil LED: Giris gucu aktif. Kirmizi LED: Cikis voltaji mevcut. Tek bakista calisma durumunu gorun.</p>
+        </div>
+    </div>
+</section>
+
+<!-- PCB Visual -->
+<section class="pcb-section">
+    <div class="section-title fade-up">
+        <h2>PCB Tasarimi</h2>
+        <p>KiCad ile tasarlanmis 2 katmanli profesyonel baski devre karti</p>
+    </div>
+    <div class="pcb-gallery fade-up">
+        <div class="pcb-img-wrap">
+            <img src="pcb_3d_iso.png" alt="Boost Converter PCB 3D Izometrik Gorunum">
+            <div class="pcb-img-label">3D Izometrik Gorunum</div>
+        </div>
+        <div class="pcb-img-wrap">
+            <img src="pcb_3d_top.png" alt="Boost Converter PCB Ust Gorunum">
+            <div class="pcb-img-label">Ust Gorunum &bull; 110x80mm &bull; FR4 &bull; Siyah Mask</div>
+        </div>
+    </div>
+</section>
+
+<!-- Specs -->
+<section class="specs" id="teknik">
+    <div class="specs-inner">
+        <div class="section-title fade-up">
+            <h2>Teknik Ozellikler</h2>
+            <p>Detayli teknik bilgiler</p>
+        </div>
+        <table class="specs-table fade-up">
+            <tr><td>Giris Gerilimi</td><td>12V DC (10-14V)</td></tr>
+            <tr><td>Cikis Gerilimi</td><td>24V - 33V DC (trimpot ile ayarlanabilir)</td></tr>
+            <tr><td>Voltaj Ayari</td><td>Bourns 3296W 22k Multiturn Trimpot</td></tr>
+            <tr><td>Maks. Giris Akimi</td><td>20A (surekli)</td></tr>
+            <tr><td>Maks. Cikis Gucu</td><td>960W</td></tr>
+            <tr><td>Verimlilik</td><td>%90 - %94</td></tr>
+            <tr><td>Anahtarlama Frekansi</td><td>50 kHz</td></tr>
+            <tr><td>PWM Kontrolcu</td><td>TL494 (Texas Instruments)</td></tr>
+            <tr><td>Gate Driver</td><td>IR2110 (Infineon)</td></tr>
+            <tr><td>MOSFET</td><td>IRFP4110 (100V, 180A, 3.7mOhm)</td></tr>
+            <tr><td>Cikis Diyodu</td><td>MBR40250G (250V, 40A Schottky)</td></tr>
+            <tr><td>Induktor</td><td>22uH Toroid (Demir Tozu)</td></tr>
+            <tr><td>Giris Kapasitor</td><td>2200uF/25V Elektrolitik + 100nF Seramik</td></tr>
+            <tr><td>Cikis Kapasitor</td><td>2x 470uF/63V Elektrolitik</td></tr>
+            <tr><td>Sigorta</td><td>30A Blade (ATO) Sigorta</td></tr>
+            <tr><td>LED Gostergeler</td><td>Yesil: Guc ON | Kirmizi: Cikis OK</td></tr>
+            <tr><td>Kart Boyutu</td><td>110 x 80 mm</td></tr>
+            <tr><td>Katman Sayisi</td><td>2 (On: Guc yolu, Arka: GND dokum)</td></tr>
+            <tr><td>PCB Finish</td><td>Siyah Solder Mask + ENIG (Altin Kaplama)</td></tr>
+            <tr><td>Kart Kalinligi</td><td>1.6mm FR4</td></tr>
+            <tr><td>Baglanti</td><td>Vidalanabilir Terminal Bloklari (5.08mm)</td></tr>
+            <tr><td>Montaj</td><td>4x M3 montaj deligi</td></tr>
+            <tr><td>Calisma Sicakligi</td><td>-20C ~ +70C</td></tr>
+        </table>
+    </div>
+</section>
+
+<!-- Comparison -->
+<section class="specs" id="karsilastirma">
+    <div class="specs-inner">
+        <div class="section-title fade-up">
+            <h2>Neden Bizi Secmelisiniz?</h2>
+            <p>Ucuz ithal kartlarla karsilastirma</p>
+        </div>
+        <table class="specs-table fade-up">
+            <tr style="border-bottom:2px solid rgba(0,212,255,0.2);">
+                <td style="color:var(--accent);font-weight:700;">Ozellik</td>
+                <td style="color:var(--accent);font-weight:700;">BoostPower v2.0</td>
+                <td style="color:rgba(224,232,240,0.3);font-weight:700;">Jenerik Kartlar</td>
+            </tr>
+            <tr>
+                <td>Komponent Tipi</td>
+                <td>THT (Delikli Montaj) &#10003;</td>
+                <td style="color:rgba(224,232,240,0.3);">SMD (Yuzey Montaj)</td>
+            </tr>
+            <tr>
+                <td>Sahada Tamir</td>
+                <td>Kolay - lehim havyasiyla &#10003;</td>
+                <td style="color:rgba(224,232,240,0.3);">Zor - ozel ekipman gerek</td>
+            </tr>
+            <tr>
+                <td>Titresim Dayanimi</td>
+                <td>Yuksek - THT bacaklar &#10003;</td>
+                <td style="color:rgba(224,232,240,0.3);">Dusuk - SMD lehim kirilir</td>
+            </tr>
+            <tr>
+                <td>Sigorta Korumasi</td>
+                <td>30A Blade sigorta &#10003;</td>
+                <td style="color:rgba(224,232,240,0.3);">Yok - asiri akimda yanar</td>
+            </tr>
+            <tr>
+                <td>Voltaj Ayari</td>
+                <td>Multiturn trimpot (hassas) &#10003;</td>
+                <td style="color:rgba(224,232,240,0.3);">Tek tur pot (kayar)</td>
+            </tr>
+            <tr>
+                <td>MOSFET Sogutucu</td>
+                <td>TO-247, harici sogutucu &#10003;</td>
+                <td style="color:rgba(224,232,240,0.3);">SMD, sinirli sogutma</td>
+            </tr>
+            <tr>
+                <td>Baglanti</td>
+                <td>Vidalanabilir terminal &#10003;</td>
+                <td style="color:rgba(224,232,240,0.3);">Lehimle kablo</td>
+            </tr>
+            <tr>
+                <td>Durum Gostergesi</td>
+                <td>2x LED (Guc + Cikis) &#10003;</td>
+                <td style="color:rgba(224,232,240,0.3);">Degisken</td>
+            </tr>
+            <tr>
+                <td>Teknik Destek</td>
+                <td>Turkce, yerli uretim &#10003;</td>
+                <td style="color:rgba(224,232,240,0.3);">Yok</td>
+            </tr>
+        </table>
+    </div>
+</section>
+
+<!-- Use Cases -->
+<section class="usecases">
+    <div class="section-title fade-up">
+        <h2>Kullanim Alanlari</h2>
+        <p>12V akunuzden 24-33V guc uretin</p>
+    </div>
+    <div class="usecase-grid">
+        <div class="usecase-card fade-up">
+            <div class="icon">&#127811;</div>
+            <h3>Zeytin Silkeleme Makinesi</h3>
+            <p>12V aku ile 24-33V motorlu silkeleme makinelerini calistirin</p>
+        </div>
+        <div class="usecase-card fade-up">
+            <div class="icon">&#128664;</div>
+            <h3>Elektrikli Araclar</h3>
+            <p>12V sistemden 24-33V motor surucu beslemesi</p>
+        </div>
+        <div class="usecase-card fade-up">
+            <div class="icon">&#9889;</div>
+            <h3>Gunes Enerjisi Sistemleri</h3>
+            <p>12V panel cikisini 24-33V aku grubuna sarj</p>
+        </div>
+        <div class="usecase-card fade-up">
+            <div class="icon">&#127981;</div>
+            <h3>Endustriyel Otomasyon</h3>
+            <p>12V DC kaynaktan 24-33V endustriyel ekipman beslemesi</p>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing -->
+<section class="pricing" id="fiyat">
+    <div class="section-title fade-up">
+        <h2>Fiyatlandirma</h2>
+        <p>Komponent dahil hazir kart veya sadece PCB secenekleri</p>
+    </div>
+    <div class="price-card fade-up">
+        <div style="font-size:0.9rem;color:var(--accent);text-transform:uppercase;letter-spacing:2px;margin-bottom:1rem;">Hazir Kart</div>
+        <div class="price-tag"><span class="currency">&#8378;</span> Teklif Alin</div>
+        <ul class="price-includes">
+            <li><span class="check">&#10003;</span> Tum komponentler lehimli</li>
+            <li><span class="check">&#10003;</span> 30A sigorta dahil</li>
+            <li><span class="check">&#10003;</span> Fonksiyon testi yapilmis</li>
+            <li><span class="check">&#10003;</span> Terminal bloklari takili</li>
+            <li><span class="check">&#10003;</span> Montaj delikleri (M3)</li>
+            <li><span class="check">&#10003;</span> Teknik destek</li>
+        </ul>
+        <a href="#iletisim" class="btn btn-primary" style="display:block;text-align:center;">Siparis Ver</a>
+        <p class="price-note">Toplu siparis ve OEM icin ozel fiyat. Sadece PCB (bos kart) secenegi de mevcuttur.</p>
+    </div>
+</section>
+
+<!-- Contact -->
+<section class="contact" id="iletisim">
+    <div class="section-title fade-up">
+        <h2>Iletisim</h2>
+        <p>Siparis ve teknik sorulariniz icin bize ulasin</p>
+    </div>
+    <div class="contact-methods fade-up">
+        <a href="https://wa.me/905XXXXXXXXX" class="contact-item">
+            <span class="icon">&#128172;</span>
+            <div>
+                <div style="font-weight:700;">WhatsApp</div>
+                <div style="font-size:0.85rem;opacity:0.5;">Hizli iletisim</div>
+            </div>
+        </a>
+        <a href="mailto:info@example.com" class="contact-item">
+            <span class="icon">&#9993;</span>
+            <div>
+                <div style="font-weight:700;">E-posta</div>
+                <div style="font-size:0.85rem;opacity:0.5;">info@example.com</div>
+            </div>
+        </a>
+        <a href="tel:+905XXXXXXXXX" class="contact-item">
+            <span class="icon">&#128222;</span>
+            <div>
+                <div style="font-weight:700;">Telefon</div>
+                <div style="font-size:0.85rem;opacity:0.5;">0 5XX XXX XX XX</div>
+            </div>
+        </a>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <p>&copy; 2026 BoostPower v2.0. Tum haklari saklidir. | 12V &rarr; 24-33V Ayarlanabilir DC-DC Boost Converter</p>
+</footer>
+
+<script>
+// Scroll animations
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+});
+
+// Counter animation
+function animateCounters() {
+    document.querySelectorAll('.stat-value').forEach(el => {
+        const text = el.textContent;
+        const num = parseInt(text);
+        if (isNaN(num)) return;
+        const suffix = text.replace(/[0-9]/g, '');
+        let current = 0;
+        const step = Math.ceil(num / 40);
+        const timer = setInterval(() => {
+            current += step;
+            if (current >= num) { current = num; clearInterval(timer); }
+            el.textContent = current + suffix;
+        }, 30);
+    });
+}
+
+const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            animateCounters();
+            statsObserver.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.5 });
+
+const statsBar = document.querySelector('.stats-bar');
+if (statsBar) statsObserver.observe(statsBar);
+</script>
+
+</body>
+</html>

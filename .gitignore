@@ -1,0 +1,20 @@
+# KiCad temp/backup files
+*.lck
+*.backup
+*-backups/
+fp-info-cache
+.DS_Store
+
+# KiCad project-level settings (user-specific)
+.kicad_pro.kicad_pcb
+.kicad_pro.kicad_prl
+.kicad_pro.kicad_pro
+
+# FreeRouting
+freerouting.jar
+*.dsn
+*.ses
+logs/
+
+# Individual gerber files (zip is kept)
+gerber/
